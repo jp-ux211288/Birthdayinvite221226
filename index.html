@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE BIRTHDAY EXPERIENCE 2026 | Michael & Phillip</title>
+    <!-- Fonts: Google Playfair Display, Inter & VT323 Monospace -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- QRCode.js Library CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- CRT Scanline Overlay -->
+    <div class="scanlines"></div>
+
+    <!-- Music Control Banner -->
+    <div class="audio-control">
+        <button id="musicToggleBtn" class="audio-btn">
+            <span id="musicIcon">🔇</span> <span id="musicText">MUSIC OFF</span>
+        </button>
+    </div>
+
+    <div class="app-container">
+
+        <!-- SCENE 1: STARTSCREEN -->
+        <section id="scene-intro" class="scene active">
+            <div class="vintage-badge">MICHAEL & PHILLIP PRESENT</div>
+            <h1 class="hero-title">THE BIRTHDAY<br><em>EXPERIENCE</em></h1>
+            <div class="year-tag">2026</div>
+            <p class="tagline">ONE NIGHT. TWO BIRTHDAYS. ZERO EXCUSES.</p>
+            <button id="btn-enter" class="btn btn-primary">▶ ENTER SHOWROOM</button>
+        </section>
+
+        <!-- SCENE 2: NAME INPUT -->
+        <section id="scene-name" class="scene">
+            <div class="terminal-card">
+                <div class="mac-header">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="mac-title">System v2.6 - Identity Check</span>
+                </div>
+                <div class="card-body">
+                    <h2>WHO ARE YOU?</h2>
+                    <p class="subtitle">Before the premiere begins, we need to know who's joining the cast.</p>
+                    <form id="form-name">
+                        <div class="input-group">
+                            <label for="userNameInput">YOUR NAME</label>
+                            <input type="text" id="userNameInput" placeholder="z. B. Thomas Mustermann" required autocomplete="off">
+                        </div>
+                        <button type="submit" class="btn btn-primary">CONTINUE ▶</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCENE 3: INVITATION DETAILS -->
+        <section id="scene-invitation" class="scene">
+            <div class="welcome-banner">
+                WELCOME, <span id="displayGuestName">GUEST</span>.
+            </div>
+            
+            <div class="invitation-card">
+                <div class="promo-badge">OFFICIAL INVITATION</div>
+                <h2>YOU'RE INVITED</h2>
+                <p class="invite-text">
+                    <strong>Michael & Phillip</strong> celebrate their birthdays — and your presence has been officially requested for this exclusive premiere.
+                </p>
+
+                <div class="details-grid">
+                    <div class="detail-box">
+                        <span class="label">DATE</span>
+                        <span class="value" id="infoDate">22. Dezember 2026</span>
+                    </div>
+                    <div class="detail-box">
+                        <span class="label">DOORS OPEN</span>
+                        <span class="value" id="infoTime">19:00 Uhr</span>
+                    </div>
+                    <div class="detail-box full-width">
+                        <span class="label">LOCATION</span>
+                        <span class="value" id="infoLocation">Kurz vorm Kino<br><small>Blumenstraße 12, 46236 Bottrop</small></span>
+                    </div>
+                    <div class="detail-box full-width">
+                        <span class="label">DRESSCODE</span>
+                        <span class="value" id="infoDresscode">80s Glam / Cinema Chic / Vintage Retro</span>
+                    </div>
+                </div>
+
+                <div class="rsvp-callout">
+                    <div class="callout-title">🎟️ THIS YEAR, WE NEED A FINAL ANSWER.</div>
+                    <p>Because apparently birthdays don't organize themselves. We're planning catering, drinks, seats, and everything else that comes with throwing a proper party.</p>
+                </div>
+
+                <div class="choice-buttons">
+                    <button id="btn-choice-in" class="vhs-btn vhs-in">
+                        <span class="vhs-label">TAPE 01 // ACCEPTS</span>
+                        <span class="vhs-title">🎬 I'M IN</span>
+                    </button>
+                    <button id="btn-choice-out" class="vhs-btn vhs-out">
+                        <span class="vhs-label">TAPE 02 // DECLINES</span>
+                        <span class="vhs-title">🚫 I'M OUT</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCENE 4A: RSVP YES CONFIRMATION -->
+        <section id="scene-rsvp-yes" class="scene">
+            <div class="terminal-card">
+                <div class="mac-header">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="mac-title">Cast Reservation</span>
+                </div>
+                <div class="card-body">
+                    <div class="badge-success">EXCELLENT CHOICE</div>
+                    <h2>YOU HAVE OFFICIALLY JOINED THE CAST.</h2>
+                    <p class="subtitle">Will you bring a guest to the premiere?</p>
+
+                    <form id="form-rsvp-yes">
+                        <div class="guest-options">
+                            <label class="radio-card">
+                                <input type="radio" name="guestCount" value="0" checked>
+                                <span class="radio-text">Just me</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="guestCount" value="1">
+                                <span class="radio-text">+1 Guest</span>
+                            </label>
+                        </div>
+
+                        <div id="plusOneInputGroup" class="input-group hidden">
+                            <label for="plusOneName">NAME DEINER BEGLEITUNG (OPTIONAL)</label>
+                            <input type="text" id="plusOneName" placeholder="Name der Begleitperson" autocomplete="off">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">CONFIRM RSVP & GET TICKET ▶</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCENE 4B: RSVP NO CONFIRMATION -->
+        <section id="scene-rsvp-no" class="scene">
+            <div class="terminal-card">
+                <div class="mac-header">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="mac-title">Absence Logged</span>
+                </div>
+                <div class="card-body">
+                    <div class="badge-danger">PLOT TWIST.</div>
+                    <h2>UNFORTUNATELY, YOU WON'T BE JOINING US.</h2>
+                    <p class="subtitle">We'll miss you — but we'll try our best to have fun without you.</p>
+
+                    <button id="btn-confirm-out" class="btn btn-secondary btn-block">CONFIRM ABSENCE ▶</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCENE 5: LOADING / GLITCH EFFECT -->
+        <section id="scene-loading" class="scene">
+            <div class="glitch-box">
+                <div class="countdown" id="countdownNum">3</div>
+                <div class="glitch-text" id="glitchStatus">PRINTING ADMIT TICKET...</div>
+                <div class="vhs-bar">
+                    <div class="vhs-progress" id="vhsProgress"></div>
+                </div>
+                <p class="vhs-sub">SYNCHRONIZING VHS TRACKING & AUDIO BUFFERS...</p>
+            </div>
+        </section>
+
+        <!-- SCENE 6: FINAL TICKET VIEW -->
+        <section id="scene-ticket" class="scene">
+            <div class="ticket-header">
+                <h2>YOUR TICKET HAS ARRIVED</h2>
+                <p>Bitte erstelle einen Screenshot oder speichere dein Ticket für den Check-in.</p>
+            </div>
+
+            <!-- THE CINEMA TICKET CONTAINER -->
+            <div class="cinema-ticket">
+                <div class="ticket-left">
+                    <div class="ticket-top-banner">
+                        <span>🎬 BIRTHDAY PREMIERE 2026</span>
+                        <span class="stub-code">ADMIT ONE</span>
+                    </div>
+
+                    <div class="ticket-title-block">
+                        <div class="hosts-label">HOSTED BY</div>
+                        <h1 id="ticketHosts">MICHAEL & PHILLIP</h1>
+                    </div>
+
+                    <div class="ticket-info-grid">
+                        <div class="t-col">
+                            <span class="t-label">GUEST</span>
+                            <span class="t-val" id="ticketGuestName">THOMAS MUSTERMANN</span>
+                        </div>
+                        <div class="t-col">
+                            <span class="t-label">ACCOMPANIED BY</span>
+                            <span class="t-val" id="ticketPlusOne">JUST ME</span>
+                        </div>
+                        <div class="t-col">
+                            <span class="t-label">DATE</span>
+                            <span class="t-val" id="ticketDate">22. DEC 2026</span>
+                        </div>
+                        <div class="t-col">
+                            <span class="t-label">TIME / DOORS</span>
+                            <span class="t-val" id="ticketTime">19:00 UHR</span>
+                        </div>
+                        <div class="t-col full">
+                            <span class="t-label">LOCATION</span>
+                            <span class="t-val" id="ticketLocation">KURZ VORM KINO, BOTTROP</span>
+                        </div>
+                    </div>
+
+                    <div class="ticket-bottom-bar">
+                        <div class="t-seat-box">
+                            <span>ROW</span>
+                            <strong id="ticketRow">08</strong>
+                        </div>
+                        <div class="t-seat-box">
+                            <span>SEAT</span>
+                            <strong id="ticketSeat">17</strong>
+                        </div>
+                        <div class="t-seat-box">
+                            <span>STATUS</span>
+                            <strong id="ticketStatus">CONFIRMED</strong>
+                        </div>
+                        <div class="t-seat-box">
+                            <span>TICKET NO.</span>
+                            <strong id="ticketIdDisplay">BD26-1222-TM</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ticket-stub">
+                    <div class="stub-inner">
+                        <div class="stub-title">PREMIERE '26</div>
+                        <div class="qrcode-wrapper" id="qrcode"></div>
+                        <div class="barcode-graphic">||||| ||| ||||||| |||| ||</div>
+                        <div class="stub-id" id="ticketIdStub">BD26-1222-TM</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ticket-actions">
+                <button id="btn-download-ticket" class="btn btn-primary" onclick="window.print()">🖨️ PRINT / SAVE AS PDF</button>
+                <button id="btn-restart" class="btn btn-secondary">↺ EDIT RESPONSE</button>
+            </div>
+
+            <p class="humor-note">"Please don't lose your ticket. We spent approximately 7 minutes making it."</p>
+        </section>
+
+        <!-- SCENE 7: DECLINE CONFIRMED VIEW -->
+        <section id="scene-declined-final" class="scene">
+            <div class="terminal-card">
+                <div class="mac-header">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="mac-title">Status: Declined</span>
+                </div>
+                <div class="card-body">
+                    <h2>RESPONSE SAVED.</h2>
+                    <p>Your absence has been officially noted. If your plans change, you can update your RSVP anytime before December 22.</p>
+                    <button id="btn-restart-declined" class="btn btn-secondary" style="margin-top: 16px;">↺ CHANGE MY MIND</button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- FOOTER HOST DASHBOARD TOGGLE -->
+    <footer class="app-footer">
+        <button id="btnHostAdmin" class="admin-link">🔒 HOST DASHBOARD</button>
+    </footer>
+
+    <!-- HOST DASHBOARD MODAL -->
+    <div id="adminModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="mac-header">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="mac-title">Host RSVP Database (Local)</span>
+                <button id="btnCloseAdmin" class="close-btn">×</button>
+            </div>
+            <div class="modal-body">
+                <h3>RSVP OVERVIEW</h3>
+                <div id="adminStats" class="admin-stats-grid">
+                    <div>TOTAL RSVPS: <strong id="statTotal">0</strong></div>
+                    <div>ATTENDING: <strong id="statAttending">0</strong></div>
+                    <div>TOTAL GUESTS: <strong id="statGuests">0</strong></div>
+                </div>
+                <div class="table-scroll">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>+1 Guest</th>
+                                <th>Ticket ID</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-actions">
+                    <button id="btnExportJson" class="btn btn-secondary">📋 COPY JSON TO CLIPBOARD</button>
+                    <button id="btnClearStorage" class="btn btn-danger">⚠️ RESET LOCAL DATA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
