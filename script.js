@@ -1,10 +1,9 @@
 /* ==========================================================================
-   THE BIRTHDAY EXPERIENCE 2026 - LOGIC, DEADLINE & EMAIL DISPATCH
+   THE BIRTHDAY EXPERIENCE 2026 - LOGIC, DEADLINE LOCK & EMAIL RSVP
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Application State
     let config = {};
     let state = {
         userName: '',
@@ -15,12 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
         timestamp: ''
     };
 
-    // Synthesizer Audio State
     let audioCtx = null;
     let isMusicPlaying = false;
     let synthTimer = null;
 
-    // DOM Elements
     const scenes = {
         intro: document.getElementById('scene-intro'),
         name: document.getElementById('scene-name'),
@@ -32,19 +29,41 @@ document.addEventListener('DOMContentLoaded', () => {
         declinedFinal: document.getElementById('scene-declined-final')
     };
 
-    // Load Config and initialize
+    // Load Config
     fetch('config.json')
         .then(res => res.json())
         .then(data => {
             config = data;
+            
+            // Check deadline first
+            if (checkDeadline()) return;
+
             applyConfig();
-            checkDeadline();
             initApp();
         })
         .catch(err => {
             console.error("Could not load config.json, using defaults.", err);
             initApp();
         });
+
+    // 1. Deadline Lockout Check
+    function checkDeadline() {
+        if (!config.deadline) return false;
+
+        const now = new Date();
+        const deadlineDate = new Date(config.deadline);
+
+        if (now > deadlineDate) {
+            document.body.innerHTML = `
+                <div class="expired-screen">
+                    <div class="scanlines"></div>
+                    <h1 class="expired-text">It's too late...</h1>
+                </div>
+            `;
+            return true;
+        }
+        return false;
+    }
 
     function applyConfig() {
         if (!config.hosts) return;
@@ -58,32 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('ticketLocation').textContent = `${config.locationName.toUpperCase()}, BOTTROP`;
     }
 
-    // CHECK DEADLINE (19.11.2026 23:59:59)
-    function checkDeadline() {
-        const deadline = new Date(config.rsvpDeadline || '2026-11-19T23:59:59');
-        const now = new Date();
-
-        if (now > deadline) {
-            const callout = document.querySelector('.rsvp-callout');
-            if (callout) {
-                callout.innerHTML = `
-                    <div class="callout-title" style="color: var(--accent-red);">⛔ BOX OFFICE CLOSED</div>
-                    <p>Die Anmeldefrist ist am <strong>19.11.2026 um 23:59:59 Uhr</strong> abgelaufen. Die Besetzung steht! Melde dich bei Fragen direkt bei Michael oder Phillip.</p>
-                `;
-            }
-            const choices = document.querySelector('.choice-buttons');
-            if (choices) {
-                choices.innerHTML = `
-                    <div style="grid-column: span 2; padding: 16px; border: 1px solid var(--accent-red); background: rgba(255, 51, 102, 0.1); border-radius: 6px; text-align: center; font-family: var(--font-mono); color: var(--accent-red); font-size: 1.1rem;">
-                        THE CAST IS COMPLETE. RSVP IS CLOSED.
-                    </div>
-                `;
-            }
-        }
-    }
-
     function initApp() {
-        // Event Listeners
         document.getElementById('btn-enter').addEventListener('click', () => showScene('name'));
         
         document.getElementById('form-name').addEventListener('submit', (e) => {
@@ -99,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('btn-choice-in').addEventListener('click', () => showScene('rsvpYes'));
         document.getElementById('btn-choice-out').addEventListener('click', () => showScene('rsvpNo'));
 
-        // Radio buttons for +1
         document.querySelectorAll('input[name="guestCount"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const plusOneGroup = document.getElementById('plusOneInputGroup');
@@ -111,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // RSVP Yes Form
+        // RSVP Yes Confirmation
         document.getElementById('form-rsvp-yes').addEventListener('submit', (e) => {
             e.preventDefault();
             state.attending = true;
@@ -121,34 +114,56 @@ document.addEventListener('DOMContentLoaded', () => {
             state.timestamp = new Date().toISOString();
 
             saveRsvpToLocalStorage();
-            sendEmailNotification(state);
+            sendEmailNotification();
             startGlitchAndShowTicket();
         });
 
-        // RSVP No Confirm
+        // RSVP No Confirmation
         document.getElementById('btn-confirm-out').addEventListener('click', () => {
             state.attending = false;
             state.timestamp = new Date().toISOString();
+            
             saveRsvpToLocalStorage();
-            sendEmailNotification(state);
+            sendEmailNotification();
             showScene('declinedFinal');
         });
 
-        // Restart buttons
         document.getElementById('btn-restart').addEventListener('click', () => showScene('invitation'));
         document.getElementById('btn-restart-declined').addEventListener('click', () => showScene('invitation'));
 
-        // Music Toggle
         document.getElementById('musicToggleBtn').addEventListener('click', toggleAudio);
 
-        // Host Admin Modal
         document.getElementById('btnHostAdmin').addEventListener('click', openAdminModal);
         document.getElementById('btnCloseAdmin').addEventListener('click', closeAdminModal);
         document.getElementById('btnExportJson').addEventListener('click', exportJsonToClipboard);
         document.getElementById('btnClearStorage').addEventListener('click', clearRsvpData);
     }
 
-    // Scene Switcher Helper
+    // 2. Email Notification Service
+    function sendEmailNotification() {
+        if (!config.formspreeEndpoint || config.formspreeEndpoint.includes('DEINE_FORM_ID_HIER')) {
+            console.log("Formspree URL noch nicht konfiguriert.");
+            return;
+        }
+
+        const payload = {
+            Name: state.userName,
+            Status: state.attending ? "✅ ZUGESAGT (I'M IN)" : "❌ ABGESAGT (I'M OUT)",
+            Begleitung: state.guestCount > 0 ? (state.plusOneName ? `+1 (${state.plusOneName})` : '+1 Person') : 'Keine',
+            TicketID: state.ticketId || 'N/A',
+            Zeitpunkt: new Date().toLocaleString('de-DE')
+        };
+
+        fetch(config.formspreeEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        }).catch(err => console.error("E-Mail Versandfehler:", err));
+    }
+
     function showScene(sceneKey) {
         Object.values(scenes).forEach(s => s.classList.remove('active'));
         if (scenes[sceneKey]) {
@@ -156,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Helper: Ticket ID Generation
     function generateTicketId(name) {
         const prefix = config.ticketPrefix || 'BD26';
         const dateCode = '1222';
@@ -165,35 +179,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${prefix}-${dateCode}-${initials}${rand}`;
     }
 
-    // SEND E-MAIL NOTIFICATION
-    async function sendEmailNotification(rsvpData) {
-        if (!config.formspreeEndpoint || config.formspreeEndpoint.includes("DEINE_FORM_ID")) {
-            console.log("Formspree endpoint not set. Skipping email dispatch.");
-            return;
-        }
-
-        try {
-            await fetch(config.formspreeEndpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    GuestName: rsvpData.userName,
-                    Attending: rsvpData.attending ? "JA (Zusage)" : "NEIN (Absage)",
-                    PlusOne: rsvpData.guestCount > 0 ? `+1 (${rsvpData.plusOneName || 'Unbekannt'})` : "Nein",
-                    TicketID: rsvpData.ticketId || "Keins (Absage)",
-                    Timestamp: new Date(rsvpData.timestamp).toLocaleString('de-DE')
-                })
-            });
-            console.log("RSVP email successfully dispatched!");
-        } catch (err) {
-            console.error("Email notification error:", err);
-        }
-    }
-
-    // Glitch & Loading Sequence
     function startGlitchAndShowTicket() {
         showScene('loading');
         let count = 3;
@@ -215,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800);
     }
 
-    // Render Ticket Data & QR Code
     function renderTicketData() {
         document.getElementById('ticketGuestName').textContent = state.userName.toUpperCase();
         document.getElementById('ticketPlusOne').textContent = state.guestCount > 0 
@@ -225,12 +209,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('ticketIdDisplay').textContent = state.ticketId;
         document.getElementById('ticketIdStub').textContent = state.ticketId;
 
-        // Seat & Row calculation based on name
         const charSum = state.userName.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
         document.getElementById('ticketRow').textContent = String((charSum % 12) + 1).padStart(2, '0');
         document.getElementById('ticketSeat').textContent = String((charSum % 28) + 1).padStart(2, '0');
 
-        // Render QR Code
         const qrContainer = document.getElementById('qrcode');
         qrContainer.innerHTML = '';
         if (window.QRCode) {
@@ -245,7 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // LocalStorage Operations
     function saveRsvpToLocalStorage() {
         const stored = JSON.parse(localStorage.getItem('bday_rsvps_2026') || '[]');
         const updated = stored.filter(item => item.userName.toLowerCase() !== state.userName.toLowerCase());
@@ -253,7 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('bday_rsvps_2026', JSON.stringify(updated));
     }
 
-    // Host Admin Modal Operations
     function openAdminModal() {
         const stored = JSON.parse(localStorage.getItem('bday_rsvps_2026') || '[]');
         const tableBody = document.getElementById('adminTableBody');
@@ -308,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return str ? str.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">") : '';
     }
 
-    // Web Audio Synthesizer (80s Synthwave Sound)
     function toggleAudio() {
         if (!isMusicPlaying) {
             start80sSynth();
