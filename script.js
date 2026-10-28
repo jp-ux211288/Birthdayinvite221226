@@ -1,10 +1,9 @@
 /* ==========================================================================
-   THE BIRTHDAY EXPERIENCE 2026 - FOOLPROOF LOGIC & AUDIO
+   THE BIRTHDAY EXPERIENCE 2026 - AUTOPLAY ON ENTER
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Default Config (falls config.json noch lädt oder fehlt)
     let config = {
         hosts: "Michael & Phillip",
         date: "22. Dezember 2026",
@@ -30,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
     bgAudio.loop = true;
     let isMusicPlaying = false;
 
-    // DOM Scenes
     const scenes = {
         intro: document.getElementById('scene-intro'),
         name: document.getElementById('scene-name'),
@@ -42,10 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         declinedFinal: document.getElementById('scene-declined-final')
     };
 
-    // 1. SOFORT BUTTONS INITIALISIEREN (Damit ENTER & MUSIC immer funktionieren)
     initApp();
 
-    // 2. CONFIG IM HINTERGRUND LADEN
     fetch('config.json')
         .then(res => res.json())
         .then(data => {
@@ -54,18 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 applyConfig();
             }
         })
-        .catch(err => {
-            console.warn("config.json nicht gefunden oder fehlerhaft. Nutze Standardwerte.", err);
-            applyConfig();
-        });
+        .catch(err => applyConfig());
 
-    // Deadline Check
     function checkDeadline() {
         if (!config.deadline) return false;
         const now = new Date();
-        const deadlineDate = new Date(config.deadline);
-
-        if (now > deadlineDate) {
+        if (now > new Date(config.deadline)) {
             document.body.innerHTML = `
                 <div class="expired-screen">
                     <div class="scanlines"></div>
@@ -88,11 +78,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.getElementById('ticketLocation')) document.getElementById('ticketLocation').textContent = `${config.locationName.toUpperCase()}, BOTTROP`;
     }
 
+    // AUTOMATISCHER MUSIKSTART
+    function startAudioAuto() {
+        if (!isMusicPlaying) {
+            bgAudio.play().then(() => {
+                isMusicPlaying = true;
+                const musicIcon = document.getElementById('musicIcon');
+                const musicText = document.getElementById('musicText');
+                if (musicIcon) musicIcon.textContent = '🔊';
+                if (musicText) musicText.textContent = 'MUSIC ON';
+            }).catch(err => {
+                console.log("Autoplay blockiert bis zum ersten Klick:", err);
+            });
+        }
+    }
+
     function initApp() {
-        // ENTER BUTTON
+        // Versuche Audio direkt bei der ersten Bildschirmberührung/Klick zu starten
+        document.body.addEventListener('click', startAudioAuto, { once: true });
+
+        // ENTER BUTTON (Startet Musik sofort und wechselt Szene)
         const enterBtn = document.getElementById('btn-enter');
         if (enterBtn) {
-            enterBtn.addEventListener('click', () => showScene('name'));
+            enterBtn.addEventListener('click', () => {
+                startAudioAuto();
+                showScene('name');
+            });
         }
 
         // NAME FORM
@@ -162,10 +173,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (restart) restart.addEventListener('click', () => showScene('invitation'));
         if (restartDeclined) restartDeclined.addEventListener('click', () => showScene('invitation'));
 
-        // MUSIC BUTTON
+        // MUSIC TOGGLE BUTTON (Mute/Unmute falls jemand leiser schalten möchte)
         const musicBtn = document.getElementById('musicToggleBtn');
         if (musicBtn) {
-            musicBtn.addEventListener('click', toggleAudio);
+            musicBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (isMusicPlaying) {
+                    bgAudio.pause();
+                    isMusicPlaying = false;
+                    document.getElementById('musicIcon').textContent = '🔇';
+                    document.getElementById('musicText').textContent = 'MUSIC OFF';
+                } else {
+                    startAudioAuto();
+                }
+            });
         }
 
         // HOST ADMIN DASHBOARD
@@ -180,32 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnClear) btnClear.addEventListener('click', clearRsvpData);
     }
 
-    // AUDIO TOGGLE
-    function toggleAudio() {
-        const musicIcon = document.getElementById('musicIcon');
-        const musicText = document.getElementById('musicText');
-
-        if (!isMusicPlaying) {
-            bgAudio.play().then(() => {
-                if (musicIcon) musicIcon.textContent = '🔊';
-                if (musicText) musicText.textContent = 'MUSIC ON';
-                isMusicPlaying = true;
-            }).catch(err => {
-                console.error("Audio Playback Error:", err);
-                alert("Musik konnte nicht abgespielt werden. Bitte prüfe, ob 'DavidHasselhoffLookingForFreedom.mp3' exakt so auf GitHub liegt.");
-            });
-        } else {
-            bgAudio.pause();
-            if (musicIcon) musicIcon.textContent = '🔇';
-            if (musicText) musicText.textContent = 'MUSIC OFF';
-            isMusicPlaying = false;
-        }
-    }
-
-    // EMAIL NOTIFICATION
     function sendEmailNotification() {
         if (!config.formspreeEndpoint || config.formspreeEndpoint.includes('DEINE_FORM_ID_HIER')) return;
-
         const payload = {
             Name: state.userName,
             Status: state.attending ? "✅ ZUGESAGT (I'M IN)" : "❌ ABGESAGT (I'M OUT)",
@@ -213,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
             TicketID: state.ticketId || 'N/A',
             Zeitpunkt: new Date().toLocaleString('de-DE')
         };
-
         fetch(config.formspreeEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -221,17 +217,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(err => console.error("Email Error:", err));
     }
 
-    // SCENE SWITCHER
     function showScene(sceneKey) {
-        Object.values(scenes).forEach(s => {
-            if (s) s.classList.remove('active');
-        });
-        if (scenes[sceneKey]) {
-            scenes[sceneKey].classList.add('active');
-        }
+        Object.values(scenes).forEach(s => { if (s) s.classList.remove('active'); });
+        if (scenes[sceneKey]) scenes[sceneKey].classList.add('active');
     }
 
-    // TICKET ID GENERATOR
     function generateTicketId(name) {
         const prefix = config.ticketPrefix || 'BD26';
         const dateCode = '1222';
@@ -240,7 +230,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${prefix}-${dateCode}-${initials}${rand}`;
     }
 
-    // GLITCH SEQUENCE
     function startGlitchAndShowTicket() {
         showScene('loading');
         let count = 3;
@@ -248,12 +237,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const progressBar = document.getElementById('vhsProgress');
 
         if (progressBar) progressBar.style.width = '0%';
-        
         const interval = setInterval(() => {
             count--;
             if (countEl) countEl.textContent = count;
             if (progressBar) progressBar.style.width = `${((3 - count) / 3) * 100}%`;
-
             if (count <= 0) {
                 clearInterval(interval);
                 renderTicketData();
@@ -262,7 +249,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800);
     }
 
-    // RENDER TICKET
     function renderTicketData() {
         if (document.getElementById('ticketGuestName')) document.getElementById('ticketGuestName').textContent = state.userName.toUpperCase();
         if (document.getElementById('ticketPlusOne')) {
@@ -270,7 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? (state.plusOneName ? `+1 (${state.plusOneName.toUpperCase()})` : '+1 GUEST') 
                 : 'JUST ME';
         }
-
         if (document.getElementById('ticketIdDisplay')) document.getElementById('ticketIdDisplay').textContent = state.ticketId;
         if (document.getElementById('ticketIdStub')) document.getElementById('ticketIdStub').textContent = state.ticketId;
 
@@ -294,7 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // LOCAL STORAGE
     function saveRsvpToLocalStorage() {
         const stored = JSON.parse(localStorage.getItem('bday_rsvps_2026') || '[]');
         const updated = stored.filter(item => item.userName.toLowerCase() !== state.userName.toLowerCase());
@@ -302,7 +286,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('bday_rsvps_2026', JSON.stringify(updated));
     }
 
-    // ADMIN MODAL
     function openAdminModal() {
         const stored = JSON.parse(localStorage.getItem('bday_rsvps_2026') || '[]');
         const tableBody = document.getElementById('adminTableBody');
@@ -317,7 +300,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 attendingCount++;
                 totalGuests += 1 + (item.guestCount || 0);
             }
-
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><strong>${escapeHtml(item.userName)}</strong></td>
