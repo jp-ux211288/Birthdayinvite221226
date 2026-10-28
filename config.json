@@ -7,5 +7,7 @@
   "locationName": "Kurz vorm Kino",
   "locationAddress": "Blumenstraße 12, 46236 Bottrop",
   "dresscode": "80s Glam / Cinema Chic / Vintage Retro",
-  "ticketPrefix": "BD26"
+  "ticketPrefix": "BD26",
+  "deadline": "2026-11-19T23:59:59",
+  "formspreeEndpoint": "https://formspree.io/f/xqpkeonp"
 }
