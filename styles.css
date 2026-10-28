@@ -1,0 +1,820 @@
+/* ==========================================================================
+   THE BIRTHDAY EXPERIENCE 2026 - RETRO-FUTURISTIC CINEMA STYLESHEET
+   Style Concept: Apple 1989 x Hollywood x VHS x Synthwave
+   ========================================================================== */
+
+:root {
+    --bg-dark: #070709;
+    --card-bg: #111116;
+    --text-main: #f4f4f0;
+    --text-muted: #a0a0ab;
+    --accent-gold: #e5c158;
+    --accent-cyan: #00e5ff;
+    --accent-red: #ff3366;
+    --border-color: #2a2a35;
+    --mac-gray: #1e1e24;
+    --ticket-bg: #f5eedc;
+    --ticket-text: #1a1a1a;
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'VT323', 'Courier New', monospace;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow-x: hidden;
+    line-height: 1.5;
+}
+
+/* CRT Scanline Overlay */
+.scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 999;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.25) 50%
+    );
+    background-size: 100% 4px;
+    opacity: 0.6;
+}
+
+/* Audio Control Floating Button */
+.audio-control {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 100;
+}
+
+.audio-btn {
+    background: rgba(20, 20, 28, 0.85);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.audio-btn:hover {
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
+}
+
+/* App Main Container */
+.app-container {
+    width: 100%;
+    max-width: 680px;
+    padding: 40px 20px;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Scenes Machine Layout */
+.scene {
+    display: none;
+    width: 100%;
+    animation: fadeIn 0.4s ease forwards;
+}
+
+.scene.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* STARTSCREEN (Scene 1) */
+.vintage-badge {
+    font-size: 0.85rem;
+    letter-spacing: 4px;
+    color: var(--accent-gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.hero-title {
+    font-family: var(--font-serif);
+    font-size: clamp(2.2rem, 8vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+}
+
+.hero-title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent-cyan);
+}
+
+.year-tag {
+    font-family: var(--font-mono);
+    font-size: 1.8rem;
+    letter-spacing: 6px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.tagline {
+    font-size: 0.95rem;
+    letter-spacing: 3px;
+    color: var(--text-main);
+    margin-bottom: 36px;
+    font-weight: 300;
+}
+
+/* Buttons */
+.btn {
+    font-family: var(--font-sans);
+    padding: 14px 28px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: none;
+    outline: none;
+}
+
+.btn-primary {
+    background: var(--text-main);
+    color: var(--bg-dark);
+}
+
+.btn-primary:hover {
+    background: var(--accent-cyan);
+    color: var(--bg-dark);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    border-color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-block {
+    width: 100%;
+}
+
+/* Macintosh Retro Window Card */
+.terminal-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    text-align: left;
+}
+
+.mac-header {
+    background: var(--mac-gray);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.mac-header .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    background: #333;
+}
+
+.mac-header .dot:nth-child(1) { background: #ff5f56; }
+.mac-header .dot:nth-child(2) { background: #ffbd2e; }
+.mac-header .dot:nth-child(3) { background: #27c93f; }
+
+.mac-title {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-left: 8px;
+}
+
+.card-body {
+    padding: 28px;
+}
+
+.card-body h2 {
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+}
+
+.card-body .subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+}
+
+/* Form Inputs */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.input-group label {
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--accent-gold);
+    font-weight: 600;
+}
+
+.input-group input[type="text"] {
+    background: #0a0a0e;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 14px 16px;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: var(--font-sans);
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.input-group input[type="text"]:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+}
+
+/* INVITATION CARD (Scene 3) */
+.welcome-banner {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    color: var(--accent-cyan);
+    margin-bottom: 16px;
+}
+
+.invitation-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 28px;
+    width: 100%;
+    text-align: left;
+}
+
+.promo-badge {
+    display: inline-block;
+    background: rgba(229, 193, 88, 0.15);
+    color: var(--accent-gold);
+    border: 1px solid var(--accent-gold);
+    padding: 4px 10px;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    font-weight: 600;
+    border-radius: 2px;
+    margin-bottom: 14px;
+}
+
+.invite-text {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    line-height: 1.6;
+}
+
+.invite-text strong {
+    color: var(--text-main);
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.detail-box {
+    background: #0a0a0e;
+    border: 1px solid var(--border-color);
+    padding: 14px;
+    border-radius: 4px;
+}
+
+.detail-box.full-width {
+    grid-column: span 2;
+}
+
+.detail-box .label {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.detail-box .value {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.rsvp-callout {
+    background: rgba(255, 51, 102, 0.08);
+    border-left: 3px solid var(--accent-red);
+    padding: 16px;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 28px;
+}
+
+.callout-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--accent-red);
+    margin-bottom: 6px;
+}
+
+.rsvp-callout p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+/* VHS Choice Buttons */
+.choice-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.vhs-btn {
+    background: #0d0d12;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.vhs-btn .vhs-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.vhs-btn .vhs-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.vhs-in:hover {
+    border-color: var(--accent-cyan);
+    background: rgba(0, 229, 255, 0.08);
+    transform: translateY(-2px);
+}
+
+.vhs-out:hover {
+    border-color: var(--accent-red);
+    background: rgba(255, 51, 102, 0.08);
+    transform: translateY(-2px);
+}
+
+/* Radio Options for +1 */
+.guest-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.radio-card {
+    background: #0a0a0e;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.radio-card input[type="radio"] {
+    accent-color: var(--accent-cyan);
+}
+
+.radio-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* Glitch Scene */
+.glitch-box {
+    padding: 40px 20px;
+}
+
+.countdown {
+    font-family: var(--font-mono);
+    font-size: 5rem;
+    color: var(--accent-cyan);
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px var(--accent-cyan);
+}
+
+.glitch-text {
+    font-family: var(--font-mono);
+    font-size: 1.3rem;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+}
+
+.vhs-bar {
+    width: 260px;
+    height: 8px;
+    background: #1e1e24;
+    border-radius: 4px;
+    margin: 0 auto 16px auto;
+    overflow: hidden;
+}
+
+.vhs-progress {
+    width: 0%;
+    height: 100%;
+    background: var(--accent-cyan);
+    transition: width 0.1s linear;
+}
+
+.vhs-sub {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   CINEMA TICKET DESIGN
+   ========================================================================== */
+.ticket-header {
+    margin-bottom: 20px;
+}
+
+.ticket-header h2 {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    color: var(--accent-gold);
+}
+
+.cinema-ticket {
+    background: var(--ticket-bg);
+    color: var(--ticket-text);
+    border-radius: 12px;
+    display: flex;
+    width: 100%;
+    max-width: 620px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+    position: relative;
+    margin-bottom: 24px;
+    overflow: hidden;
+    text-align: left;
+}
+
+/* Semi-circle notches for ticket perforation */
+.cinema-ticket::before, .cinema-ticket::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: var(--bg-dark);
+    border-radius: 50%;
+    z-index: 5;
+}
+
+.cinema-ticket::before {
+    top: -10px;
+    right: 170px;
+}
+
+.cinema-ticket::after {
+    bottom: -10px;
+    right: 170px;
+}
+
+.ticket-left {
+    flex: 1;
+    padding: 24px;
+    border-right: 2px dashed #bbb;
+}
+
+.ticket-top-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-bottom: 2px solid var(--ticket-text);
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+}
+
+.stub-code {
+    background: var(--ticket-text);
+    color: var(--ticket-bg);
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+.hosts-label {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: #666;
+    font-weight: 700;
+}
+
+.ticket-title-block h1 {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 14px;
+    line-height: 1.1;
+}
+
+.ticket-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.t-col.full {
+    grid-column: span 2;
+}
+
+.t-label {
+    display: block;
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    color: #666;
+    font-weight: 700;
+}
+
+.t-val {
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.ticket-bottom-bar {
+    display: flex;
+    justify-content: space-between;
+    background: #e6dec8;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+}
+
+.t-seat-box span {
+    display: block;
+    font-size: 0.6rem;
+    color: #555;
+}
+
+.t-seat-box strong {
+    font-size: 0.95rem;
+}
+
+/* Ticket Stub Right Side */
+.ticket-stub {
+    width: 180px;
+    padding: 20px 14px;
+    background: #eae2cf;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.stub-title {
+    font-family: var(--font-serif);
+    font-size: 0.9rem;
+    font-weight: 800;
+    border-bottom: 1px solid #aaa;
+    padding-bottom: 4px;
+    width: 100%;
+}
+
+.qrcode-wrapper {
+    background: #fff;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    margin: 8px 0;
+}
+
+.barcode-graphic {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: #333;
+}
+
+.stub-id {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.ticket-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.humor-note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Utility Helpers */
+.hidden { display: none !important; }
+.badge-success { color: var(--accent-cyan); font-family: var(--font-mono); letter-spacing: 2px; font-weight: bold; margin-bottom: 6px; }
+.badge-danger { color: var(--accent-red); font-family: var(--font-mono); letter-spacing: 2px; font-weight: bold; margin-bottom: 6px; }
+
+/* Modal & Footer */
+.app-footer {
+    padding: 20px;
+}
+
+.admin-link {
+    background: none;
+    border: none;
+    color: var(--border-color);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.admin-link:hover {
+    color: var(--text-muted);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    max-width: 600px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.close-btn {
+    position: absolute;
+    right: 14px;
+    top: 6px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.admin-stats-grid {
+    display: flex;
+    gap: 16px;
+    margin: 14px 0;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    background: #0a0a0e;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.table-scroll {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    text-align: left;
+}
+
+.admin-table th, .admin-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.btn-danger {
+    background: rgba(255, 51, 102, 0.2);
+    color: var(--accent-red);
+    border: 1px solid var(--accent-red);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* RESPONSIVE DESIGN FOR SMARTPHONES */
+@media (max-width: 600px) {
+    .cinema-ticket {
+        flex-direction: column;
+        max-width: 340px;
+    }
+    
+    .cinema-ticket::before {
+        top: 240px;
+        left: -10px;
+    }
+    .cinema-ticket::after {
+        top: 240px;
+        right: -10px;
+    }
+
+    .ticket-left {
+        border-right: none;
+        border-bottom: 2px dashed #bbb;
+        padding: 18px;
+    }
+
+    .ticket-stub {
+        width: 100%;
+        padding: 16px;
+    }
+
+    .choice-buttons, .details-grid, .guest-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .detail-box.full-width {
+        grid-column: span 1;
+    }
+}
